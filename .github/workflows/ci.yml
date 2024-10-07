@@ -74,7 +74,7 @@ jobs:
       run: pkill -f 'gradlew' # Cette commande arrête l'application démarrée
 
     - name: Upload Logs
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: logs
         path: build/reports/tests/test/index.html # Ajustez le chemin vers vos logs
