@@ -34,14 +34,6 @@ jobs:
     - name: Start application
       run: ./gradlew :bootstrap:bootRun
       
-    - name: Wait for application to start
-      run: |
-        echo "Waiting for application to start..."
-        while ! nc -z localhost 8080; do   
-          sleep 1 
-        done
-        echo "Application started"
-
   automated-api-tests:
     runs-on: ubuntu-latest
     needs: build  # Assure que le job 'build' est exécuté avant 'automated-api-tests'
