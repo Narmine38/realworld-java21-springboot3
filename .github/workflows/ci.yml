@@ -47,7 +47,7 @@ jobs:
 
       - name: Sign artifacts
         run: |
-          gpg --batch --yes --passphrase "${{ secrets.GPG_PASSPHRASE }}" --output build/libs/realworld-plain.jar.sig --detach-sign build/libs/realworld-plain.jar
+          gpg --pinentry-mode loopback --batch --yes --passphrase "${{ secrets.GPG_PASSPHRASE }}" --output build/libs/realworld-plain.jar.sig --detach-sign build/libs/realworld-plain.jar
 
       - name: Upload signature and artifact
         uses: actions/upload-artifact@v3
