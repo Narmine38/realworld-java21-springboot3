@@ -59,9 +59,32 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew test
 
-  start-and-test:
+  verify-signature:
     runs-on: ubuntu-latest
     needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download signed artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: signed-artifact
+
+      - name: Set up GPG
+        run: |
+          echo "$GPG_PUBLIC_KEY" > public.key
+          gpg --batch --import public.key
+        env:
+          GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+
+      - name: Verify artifact signature
+        run: gpg --verify build/libs/realworld-plain.jar.sig build/libs/realworld-plain.jar
+
+  start-and-test:
+    runs-on: ubuntu-latest
+    needs: [build, verify-signature]
 
     steps:
       - name: Checkout repository
@@ -106,26 +129,3 @@ jobs:
         with:
           name: logs
           path: build/reports/tests/test/index.html
-
-  verify-signature:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up GPG
-        run: |
-          echo "$GPG_PUBLIC_KEY" > public.key
-          gpg --batch --import public.key
-        env:
-          GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
-
-      - name: Download signed artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: signed-artifact
-
-      - name: Verify artifact signature
-        run: gpg --verify build/libs/realworld-plain.jar.sig build/libs/realworld-plain.jar
