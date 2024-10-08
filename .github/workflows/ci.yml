@@ -136,6 +136,9 @@ jobs:
       - name: Stop application
         run: pkill -f 'gradlew'
 
+      - name: List test reports directory
+        run: ls -l build/reports/tests/test/
+
       - name: Upload Logs
         uses: actions/upload-artifact@v4
         with:
