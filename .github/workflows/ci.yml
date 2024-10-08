@@ -53,14 +53,15 @@ jobs:
         with:
           name: build-artefacts
 
-      - name: Sign artefacts
-        env:
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      - name: Configure signing keys
         run: |
-          echo $SIGNING_SECRET_KEY_RING_FILE | base64 --decode > /tmp/secring.gpg
-          ./gradlew signArchives -Psigning.keyId=$SIGNING_KEY_ID -Psigning.secretKeyRingFile=/tmp/secring.gpg -Psigning.password=$SIGNING_PASSWORD
+          echo ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }} | base64 --decode > /tmp/secring.gpg
+          echo "signing.keyId=${{ secrets.SIGNING_KEY_ID }}" >> gradle.properties
+          echo "signing.secretKeyRingFile=/tmp/secring.gpg" >> gradle.properties
+          echo "signing.password=${{ secrets.SIGNING_PASSWORD }}" >> gradle.properties
+
+      - name: Sign artefacts
+        run: ./gradlew signArchives
 
       - name: Upload signed artefacts
         uses: actions/upload-artifact@v3
