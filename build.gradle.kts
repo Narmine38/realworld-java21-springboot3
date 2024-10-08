@@ -15,6 +15,7 @@ allprojects {
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
+    plugins.apply("signing")
 
     java {
         toolchain {
@@ -77,13 +78,15 @@ allprojects {
     }
 }
 
-tasks.register("signArchives") {
+tasks.register<DefaultTask>("signArchives") {
     doLast {
-        val signingExtension = extensions.getByType<SigningExtension>()
-        signingExtension.useInMemoryPgpKeys(findProperty("signing.keyId") as String?,
+        val signingExtension = project.the<SigningExtension>()
+        signingExtension.useInMemoryPgpKeys(
+            findProperty("signing.keyId") as String?,
             findProperty("signing.secretKeyRingFile") as String?,
-            findProperty("signing.password") as String?)
-        signingExtension.sign(configurations.archives.get())
+            findProperty("signing.password") as String?
+        )
+        signingExtension.sign(configurations["archives"])
     }
 }
 
