@@ -28,23 +28,41 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
-      - name: List build directory
-        run: ls -l build
-
       - name: List build/libs directory
         run: ls -l build/libs
 
-      - name: List build/spotless directory
-        run: ls -l build/spotless
+      - name: Verify that the JAR file exists
+        run: |
+          if [ ! -f "build/libs/realworld-plain.jar" ]; then
+            echo "Error: build/libs/realworld-plain.jar not found."
+            exit 1
+          fi
 
-      - name: List build/tmp directory
-        run: ls -l build/tmp
+      - name: Set up GPG
+        run: |
+          echo "$GPG_PRIVATE_KEY" | base64 --decode > private.key
+          gpg --batch --import private.key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Sign artifacts
+        run: |
+          gpg --pinentry-mode loopback --batch --yes --passphrase "${{ secrets.GPG_PASSPHRASE }}" --output build/libs/realworld-plain.jar.sig --detach-sign build/libs/realworld-plain.jar
+
+      - name: Upload signature and artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-artifact
+          path: build/libs/realworld-plain.jar.sig
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-jar
+          path: build/libs/realworld-plain.jar
 
       - name: Run tests with Gradle
         run: ./gradlew test
-
-      - name: List test reports directory
-        run: ls -l build/reports/tests/test/
 
   verify-signature:
     runs-on: ubuntu-latest
@@ -118,11 +136,7 @@ jobs:
       - name: Stop application
         run: pkill -f 'gradlew'
 
-      - name: List test reports directory
-        run: ls -l build/reports/tests/test/
-
       - name: Upload Logs
-        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: build/reports/tests/test/index.html
