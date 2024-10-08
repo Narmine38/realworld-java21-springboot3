@@ -7,6 +7,7 @@ plugins {
     id("com.diffplug.spotless") version "6.22.0"
     id("org.springframework.boot") version "3.3.0"
     id("io.spring.dependency-management") version "1.1.5"
+    id("signing")
 }
 
 allprojects {
@@ -74,4 +75,18 @@ allprojects {
             trimTrailingWhitespace()
         }
     }
+}
+
+tasks.register("signArchives") {
+    doLast {
+        val signingExtension = extensions.getByType<SigningExtension>()
+        signingExtension.useInMemoryPgpKeys(findProperty("signing.keyId") as String?,
+            findProperty("signing.secretKeyRingFile") as String?,
+            findProperty("signing.password") as String?)
+        signingExtension.sign(configurations.archives.get())
+    }
+}
+
+tasks.named("build") {
+    dependsOn("signArchives")
 }
