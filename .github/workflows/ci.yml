@@ -54,7 +54,12 @@ jobs:
         with:
           name: signed-artifact
           path: build/libs/realworld-plain.jar.sig
-        continue-on-error: true # Pour s'assurer que le build ne casse pas si cette étape échoue
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-jar
+          path: build/libs/realworld-plain.jar
 
       - name: Run tests with Gradle
         run: ./gradlew test
@@ -71,6 +76,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: signed-artifact
+          path: build/libs/
+
+      - name: Download JAR
+        uses: actions/download-artifact@v3
+        with:
+          name: built-jar
+          path: build/libs/
 
       - name: Set up GPG
         run: |
