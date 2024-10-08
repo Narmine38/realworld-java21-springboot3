@@ -33,8 +33,8 @@ jobs:
 
       - name: Verify that the JAR file exists
         run: |
-          if [ ! -f "build/libs/my-artifact.jar" ]; then
-            echo "Error: build/libs/my-artifact.jar not found."
+          if [ ! -f "build/libs/realworld-plain.jar" ]; then
+            echo "Error: build/libs/realworld-plain.jar not found."
             exit 1
           fi
 
@@ -47,13 +47,13 @@ jobs:
 
       - name: Sign artifacts
         run: |
-          gpg --batch --yes --passphrase "${{ secrets.GPG_PASSPHRASE }}" --output build/libs/my-artifact.jar.sig --detach-sign build/libs/my-artifact.jar
+          gpg --batch --yes --passphrase "${{ secrets.GPG_PASSPHRASE }}" --output build/libs/realworld-plain.jar.sig --detach-sign build/libs/realworld-plain.jar
 
       - name: Upload signature and artifact
         uses: actions/upload-artifact@v3
         with:
           name: signed-artifact
-          path: build/libs/my-artifact.jar.sig
+          path: build/libs/realworld-plain.jar.sig
         continue-on-error: true # Pour s'assurer que le build ne casse pas si cette étape échoue
 
       - name: Run tests with Gradle
@@ -128,4 +128,4 @@ jobs:
           name: signed-artifact
 
       - name: Verify artifact signature
-        run: gpg --verify build/libs/my-artifact.jar.sig build/libs/my-artifact.jar
+        run: gpg --verify build/libs/realworld-plain.jar.sig build/libs/realworld-plain.jar
