@@ -137,6 +137,7 @@ jobs:
         run: pkill -f 'gradlew'
 
       - name: Upload Logs
+        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: build/reports/tests/test/index.html
