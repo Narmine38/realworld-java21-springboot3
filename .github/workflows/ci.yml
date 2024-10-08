@@ -28,6 +28,16 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: List build/libs directory
+        run: ls -l build/libs
+
+      - name: Verify that the JAR file exists
+        run: |
+          if [ ! -f "build/libs/my-artifact.jar" ]; then
+            echo "Error: build/libs/my-artifact.jar not found."
+            exit 1
+          fi
+
       - name: Set up GPG
         run: |
           echo "$GPG_PRIVATE_KEY" | base64 --decode > private.key
