@@ -42,6 +42,10 @@ allprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
+        reports {
+            html.required.set(true)
+            junitXml.required.set(true)
+        }
     }
 
     tasks.getByName<BootJar>("bootJar") {
