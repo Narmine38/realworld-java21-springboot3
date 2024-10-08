@@ -7,7 +7,6 @@ plugins {
     id("com.diffplug.spotless") version "6.22.0"
     id("org.springframework.boot") version "3.3.0"
     id("io.spring.dependency-management") version "1.1.5"
-    id("signing")
 }
 
 allprojects {
@@ -15,7 +14,6 @@ allprojects {
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "signing")
 
     java {
         toolchain {
@@ -74,19 +72,6 @@ allprojects {
             ktlint()
             indentWithSpaces()
             trimTrailingWhitespace()
-        }
-    }
-}
-
-subprojects {
-    plugins.withType<SigningPlugin> {
-        extensions.configure<SigningExtension> {
-            useInMemoryPgpKeys(
-                findProperty("signing.keyId") as String?,
-                findProperty("signing.secretKeyRingFile") as String?,
-                findProperty("signing.password") as String?
-            )
-            sign(configurations.archives.get())
         }
     }
 }
